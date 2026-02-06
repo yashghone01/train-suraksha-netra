@@ -77,11 +77,6 @@ https://templatemo.com/tm-608-daynight-admin
         <div class="stat-value" id="criticalCount">1</div>
         <div class="stat-change negative">Emergency</div>
     </div>
-    <div class="stat-card">
-        <div class="stat-label">⚠ Warnings</div>
-        <div class="stat-value" id="warningCount">2</div>
-        <div class="stat-change warning">Attention</div>
-    </div>
 
 </div>
 
@@ -159,3 +154,47 @@ setInterval(()=>{
     <script src="templatemo-daynight-script.js"></script>
 </body>
 </html>
+
+<script>
+// Function to read alerts from storage and update the table
+function updateAlertTable() {
+    const alertLog = document.getElementById("alertLog");
+    // Get the shared data
+    const alerts = JSON.parse(localStorage.getItem("railAlerts")) || [];
+
+    // Update the "Active Alerts" count at the top
+    const criticalCountEl = document.getElementById("criticalCount");
+    if(criticalCountEl) criticalCountEl.innerText = alerts.length;
+
+    // Clear the old table rows
+    alertLog.innerHTML = "";
+    
+    // If no alerts, show a message
+    if(alerts.length === 0) {
+        alertLog.innerHTML = "<tr><td colspan='4' style='text-align:center;'>System Clear - No Active Alerts</td></tr>";
+        return;
+    }
+
+    // Build the new table rows
+    alerts.forEach(alert => {
+        const row = `
+            <tr>
+                <td>${alert.time}</td>
+                <td>${alert.type}</td>
+                <td>${alert.message}</td>
+                <td><span class="badge badge-red">${alert.status}</span></td>
+            </tr>`;
+        alertLog.insertAdjacentHTML('beforeend', row);
+    });
+}
+
+// 1. Update the table as soon as the page loads
+window.onload = updateAlertTable;
+
+// 2. CRITICAL: Update the table automatically when Dashboard sends a new alert
+window.addEventListener('storage', (event) => {
+    if (event.key === "railAlerts") {
+        updateAlertTable();
+    }
+});
+</script>

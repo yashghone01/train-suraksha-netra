@@ -240,3 +240,8 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
+// Clear all rail alerts when the Dashboard loads
+window.onload = function() {
+    localStorage.removeItem("railAlerts");
+    console.log("Alert logs reset for new session.");
+};
