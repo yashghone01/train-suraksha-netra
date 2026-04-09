@@ -78,7 +78,14 @@ function triggerAlert(sensorKey, type, message) {
     localStorage.setItem("railAlerts", JSON.stringify(alerts));
 
     // Send to Telegram (Replacement for Pipedream)
-    const telMsg = `📍 <b>Alert:</b> ${type}\n📝 <b>Message:</b> ${message}\n🌡 Temp: ${temp}°C | 💧 Hum: ${hum}%`;
+    const telMsg = `📍 <b>Alert:</b> ${type}
+📝 <b>Message:</b> ${message}
+
+🌡 <b>Temp:</b> ${temp.toFixed(1)}°C
+💧 <b>Hum:</b> ${hum.toFixed(0)}%
+🔥 <b>Gas:</b> ${gas.toFixed(0)} ppm
+🚀 <b>Speed:</b> ${speed.toFixed(2)} m/s
+🧭 <b>Tilt:</b> ${gyro.toFixed(1)}°`;
     sendTelegramAlert(telMsg);
 }
 
