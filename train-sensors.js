@@ -3,6 +3,10 @@ const CHANNEL_ID = '3263535';
 const READ_API_KEY = '2L5XBEJJ8WHEQXXX'; 
 const TS_URL = `https://api.thingspeak.com/channels/${CHANNEL_ID}/feeds.json?api_key=${READ_API_KEY}&results=1`;
 
+// --- TELEGRAM CONFIG (Free replacement for Pipedream) ---
+const TELEGRAM_BOT_TOKEN = '8418028241:AAHCUNDb6hgGU-Xod45kvlZYtsO8bb3CDdI'; // Replace with your Bot Token
+const TELEGRAM_CHAT_ID = '-5165397703';
+
 // --- GLOBAL VARIABLES ---
 let temp = 0, gas = 0, hum = 0, gyro = 0, speed = 0; 
 const labels = Array(30).fill("");
@@ -42,6 +46,22 @@ function updateChartData(chart, value) {
 }
 
 // 2. Alert Logic with 30-Second Cooldown
+async function sendTelegramAlert(message) {
+    if (TELEGRAM_BOT_TOKEN === 'YOUR_BOT_TOKEN_HERE') return;
+    const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+    try {
+        await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                chat_id: TELEGRAM_CHAT_ID,
+                text: `🚨 <b>RAIL SENSE STATUS REPORT</b> 🚨\n\n${message}\n\n⚠️ <b>SYSTEM STATUS: CRITICAL</b>`,
+                parse_mode: 'HTML'
+            })
+        });
+    } catch (e) { console.error("Telegram Error:", e); }
+}
+
 function triggerAlert(sensorKey, type, message) {
     const now = Date.now();
     if (now - lastAlertTimes[sensorKey] < 30000) return; 
@@ -56,6 +76,10 @@ function triggerAlert(sensorKey, type, message) {
     alerts.unshift(newAlert); 
     if (alerts.length > 10) alerts.pop();
     localStorage.setItem("railAlerts", JSON.stringify(alerts));
+
+    // Send to Telegram (Replacement for Pipedream)
+    const telMsg = `📍 <b>Alert:</b> ${type}\n📝 <b>Message:</b> ${message}\n🌡 Temp: ${temp}°C | 💧 Hum: ${hum}%`;
+    sendTelegramAlert(telMsg);
 }
 
 // 3. FETCH REAL DATA FROM THINGSPEAK
@@ -125,5 +149,5 @@ function updateDashboard() {
 }
 
 // Start Cycle
-setInterval(fetchHardwareData, 200); 
+setInterval(fetchHardwareData, 2000); 
 fetchHardwareData();
