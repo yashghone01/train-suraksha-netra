@@ -24,7 +24,9 @@ window.onload = function() {
 
 // 1. Chart Creation Helper
 function createChart(id, color) {
-  return new Chart(document.getElementById(id), {
+  const el = document.getElementById(id);
+  if (!el) return null;
+  return new Chart(el, {
     type: "line",
     data: {
       labels,
@@ -40,6 +42,7 @@ const humChart  = createChart("humChart", "#22c55e");
 const gyroChart = createChart("gyroChart", "#38bdf8");
 
 function updateChartData(chart, value) {
+  if (!chart) return;
   chart.data.datasets[0].data.push(value);
   if (chart.data.datasets[0].data.length > 30) chart.data.datasets[0].data.shift();
   chart.update();
@@ -124,28 +127,28 @@ function updateDashboard() {
   let tCol = temp <= 35 ? "#22c55e" : temp <= 45 ? "#f59e0b" : "#ef4444";
   document.getElementById("tempValue").innerText = temp.toFixed(1) + " °C";
   document.getElementById("tempValue").style.color = tCol;
-  tempChart.data.datasets[0].borderColor = tCol;
+  if (tempChart) tempChart.data.datasets[0].borderColor = tCol;
   if (temp > 45) triggerAlert("temp", "🌡 Temp", "Hardware Overheat: " + temp.toFixed(1) + "°C");
 
   // Humidity
   let hCol = (hum >= 30 && hum <= 70) ? "#22c55e" : "#ef4444";
   document.getElementById("humValue").innerText = hum.toFixed(0) + " %";
   document.getElementById("humValue").style.color = hCol;
-  humChart.data.datasets[0].borderColor = hCol;
+  if (humChart) humChart.data.datasets[0].borderColor = hCol;
   if (hum > 80) triggerAlert("hum", "💧 Hum", "High Moisture: " + hum.toFixed(0) + "%");
 
   // Gas
   let gCol = gas < 300 ? "#22c55e" : gas <= 600 ? "#f59e0b" : "#ef4444";
   document.getElementById("gasValue").innerText = gas.toFixed(0) + " ppm";
   document.getElementById("gasValue").style.color = gCol;
-  gasChart.data.datasets[0].borderColor = gCol;
+  if (gasChart) gasChart.data.datasets[0].borderColor = gCol;
   if (gas > 600) triggerAlert("gas", "🔥 Gas", "Leakage Detected: " + gas.toFixed(0) + " ppm");
 
   // Gyro
   let yCol = gyro < 20 ? "#22c55e" : gyro <= 300 ? "#f59e0b" : "#ef4444";
   document.getElementById("gyroValue").innerText = gyro.toFixed(2) + " °";
   document.getElementById("gyroValue").style.color = yCol;
-  gyroChart.data.datasets[0].borderColor = yCol;
+  if (gyroChart) gyroChart.data.datasets[0].borderColor = yCol;
   if (gyro > 300) triggerAlert("gyro", "🧭 Gyro", "Sudden Jerk Detected!");
 
   // Chart Updates
